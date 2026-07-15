@@ -1,119 +1,70 @@
 # Bird Migration Network Visualizer
 
-An interactive tool for visualizing and stress-testing migratory bird movement across the United States, with a focus on how artificial light at night (ALAN) intersects with migration corridors.
+An interactive tool that models North American bird migration as a network and tests whether stopover sites exposed to artificial light at night (ALAN) are structurally critical to that network — i.e., whether losing them would fragment migration connectivity more than losing random sites.
 
-Built with eBird observation data (2024–2026) and NASA VIIRS nightlight satellite imagery, aggregated onto an H3 hexagonal grid.
+**[Live Demo →](https://bird-migration-git-main-ting-ya.vercel.app/)**
+
+## The Research Question
+
+Prior research shows artificial light at night is a strong predictor of where birds stop over during migration, and that it alters nocturnal migration behavior. What's less understood is whether migration *networks* become structurally dependent on those brightly-lit sites — whether disrupting them (through further development, or conservation intervention) would fragment connectivity more severely than losing an equivalent number of random sites.
+
+This project builds a migration network from real observation data, then runs stress tests comparing two disruption scenarios:
+1. Removing the brightest (most light-polluted) stopover sites first
+2. Removing an equivalent number of random sites
+
+...and measures how much each scenario fragments the network.
+
+## Approach
+
+1. **Bird observations** are pulled from the eBird Basic Dataset and aggregated onto an H3 hexagonal grid (~city-sized cells), grouped by month, for 4 species over 2024–2026.
+2. **Nightlight exposure** comes from NASA VIIRS Black Marble monthly composites, aggregated to the same H3 grid and averaged per year (light pollution at a location is a chronic, stable property — an annual estimate avoids noise from transient cloud/snow cover in any single month).
+3. **The migration network** treats each (H3 cell, month) as a node and infers directed edges from month *t* to month *t+1*, weighted by `(source activity × target activity) / distance`, keeping only edges that rank in both their source's and target's top-10 strongest connections.
+4. **Stress testing** removes nodes from this network — manually, or automatically by brightness vs. randomly — and tracks how the largest connected component and fragmentation rate respond.
+
+Full methodology, database schema, and API reference are in [DOCUMENTATION.md](DOCUMENTATION.md).
+
+## Dataset
+
+| Source | What it provides |
+|---|---|
+| [eBird Basic Dataset](https://ebird.org/data/download) (Cornell Lab of Ornithology) | Species-level observation records, United States, Jan 2024 – present |
+| [NASA VIIRS Black Marble (VNP46A3)](https://ladsweb.modaps.eosdis.nasa.gov) | Monthly nighttime lights composites, aggregated yearly |
+
+**Species:** Ruby-throated Hummingbird, Swainson's Thrush, Magnolia Warbler, Song Sparrow
+**Years:** 2024, 2025, 2026
 
 ## Features
 
-- **Map View** — Bird observation density overlaid with ALAN glow by month and species
-- **Network View** — Inferred migration routes as a directed graph, color-coded by season
-- **Stress Test** — Click to remove stopover nodes and watch connectivity metrics (LCC, fragmentation) update live
-- **Experiments** — Fragility curve comparing targeted (high-light) vs. random node removal
-
-**Species:** Ruby-throated Hummingbird, Swainson's Thrush, Magnolia Warbler, Song Sparrow  
-**Years:** 2024, 2025, 2026
+- **Map View** — Bird observation density overlaid with an ALAN glow layer, filterable by species/year/month
+- **Network View** — The full-year inferred migration network, stopover nodes sized by activity and edges color-coded by season
+- **Stress Test** — Click individual stopover nodes to remove them and watch connectivity metrics (largest connected component, number of components, fragmentation rate) update live
+- **Experiments** — Automated comparison of high-light vs. random node removal, plus a fragility curve sweeping removal percentage from 0–100%
 
 ## Tech Stack
 
 | Layer | Stack |
 |---|---|
-| Frontend | React, D3.js, TopoJSON, Vite |
-| Backend | FastAPI (Python) |
+| Frontend | React, D3.js, TopoJSON, Vite — deployed on Vercel |
+| Backend | FastAPI (Python) — deployed on Railway |
 | Database | PostgreSQL via Supabase |
-| Data processing | pandas, H3, h5py (NASA HDF5), HDBSCAN |
+| Data processing | pandas, H3, h5py (NASA HDF5), numpy |
 
-## Setup
-
-### 1. Clone & configure environment
+## Running Locally
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Letitia-Chang/bird_migration.git
 cd bird_migration
-```
 
-Copy the example env files and fill in your Supabase credentials:
-
-```bash
-cp backend/.env.example backend/.env
-cp scripts/.env.example scripts/.env
-cp frontend/.env.example frontend/.env   # optional: only needed for deployment
-```
-
-### 2. Backend
-
-```bash
+# Backend
 cd backend
+cp .env.example .env   # fill in your own Supabase credentials
 pip install -r requirements.txt
 uvicorn main:app --reload
-```
 
-### 3. Frontend
-
-```bash
+# Frontend (in a separate terminal, requires Node 18+)
 cd frontend
 npm install
 npm run dev
 ```
 
 The app will be available at `http://localhost:5173`.
-
-## Database Setup (from scratch)
-
-You'll need a free Supabase account and data from two public sources.
-
-### 1. Create a Supabase project
-
-1. Go to [supabase.com](https://supabase.com) and create a free project
-2. From **Project Settings → Database**, copy your connection string details
-3. Fill in `backend/.env` and `scripts/.env` with your credentials
-
-### 2. Get eBird data
-
-eBird is free but requires a one-time access request (usually approved in 1–3 days).
-
-1. Create an account at [ebird.org](https://ebird.org)
-2. Go to [ebird.org/data/download](https://ebird.org/data/download) → **Request Access** under "eBird Basic Dataset (EBD)"
-3. Once approved, request a **Custom Download** for each species:
-   - Ruby-throated Hummingbird
-   - Swainson's Thrush
-   - Magnolia Warbler
-   - Song Sparrow
-   - Region: United States · Date range: Jan 2024 – Dec 2026
-4. Place the downloaded `.txt` files in `scripts/data/ebird_raw/`
-5. Run:
-   ```bash
-   cd scripts
-   pip install pandas h3 psycopg[binary] python-dotenv
-   python process_ebird.py
-   ```
-
-### 3. Get NASA nightlight data
-
-1. Register at [NASA Earthdata](https://urs.earthdata.nasa.gov/users/new) (free)
-2. Go to [AppEEARS](https://appeears.earthdatacloud.nasa.gov) → **Extract → Area**
-3. Configure the request:
-   - **Layer:** search `VNP46A3` → select `Gap_Filled_DNB_BRDF-Corrected_NTL`
-   - **Date range:** 01/01/2024 – 12/31/2026
-   - **Spatial:** paste this bounding box for the contiguous US:
-     ```json
-     {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-125,24],[-66,24],[-66,50],[-125,50],[-125,24]]]}}
-     ```
-   - **Output format:** HDF-EOS5 (.h5)
-4. Submit and wait for the email (a few hours to a day)
-5. Download all `.h5` files into `scripts/data/nightlight_raw/`
-6. Run:
-   ```bash
-   pip install h5py numpy
-   python process_nightlight.py
-   ```
-
-### 4. Regenerate saved networks (optional)
-
-The `backend/saved_networks/` folder contains pre-computed network JSONs. If you re-populate the DB with fresh data, regenerate them by hitting the `/nodes` and `/edges` endpoints for each species+year combination and saving the results.
-
-## Data Sources
-
-- **eBird** — Cornell Lab of Ornithology, [ebird.org/data/download](https://ebird.org/data/download)
-- **NASA VIIRS Black Marble** — Monthly nightlight composites (VNP46A3), via [AppEEARS](https://appeears.earthdatacloud.nasa.gov)
-- Network graphs pre-cached in `backend/saved_networks/`
