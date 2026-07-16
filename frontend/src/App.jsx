@@ -520,7 +520,11 @@ function MapView({ geo, density, nightlight, showALAN, alanOpacity, selectedBird
 }
 
 // ── Network View ──────────────────────────────────────────────────────────────
-function NetworkView({ geo, network }) {
+function NetworkView({ geo, network, activeSeasons }) {
+  const visibleEdges = activeSeasons
+    ? network.edges.filter(e => activeSeasons.has(e.season))
+    : network.edges;
+  network = { ...network, edges: visibleEdges };
   const nodeMap = Object.fromEntries(network.nodes.map(n => [n.id, n]));
   const maxRawActivity = Math.max(...network.nodes.map(n => n.rawActivity || 0), 1);
   const densityColorScale = d3.scaleLinear()
@@ -811,18 +815,25 @@ function MetricCard({ label, value, color = "#7eb8f0", sublabel = null }) {
   );
 }
 
-function StressTestView({ geo, network }) {
+function StressTestView({ geo, network, activeSeasons }) {
   const [manualRemovedIds, setManualRemovedIds] = useState(new Set());
   const [zoomTransform, setZoomTransform] = useState(d3.zoomIdentity);
   const svgRef = useRef(null);
   const zoomRef = useRef(null);
+
+  // Season filtering only affects what's drawn — LCC/fragmentation metrics
+  // always reflect the full-year network regardless of which seasons are
+  // toggled on for display.
+  const visibleEdges = activeSeasons
+    ? network.edges.filter(e => activeSeasons.has(e.season))
+    : network.edges;
 
   const nodeMap = Object.fromEntries(network.nodes.map(n => [n.id, n]));
   const baselineMetrics = computeGraphMetrics(network.nodes, network.edges, new Set());
   const removedIds = new Set(manualRemovedIds);
   const currentMetrics = computeGraphMetrics(network.nodes, network.edges, removedIds);
 
-  const edgeSet = new Set(network.edges.map(e => `${e.source}__${e.target}`));
+  const edgeSet = new Set(visibleEdges.map(e => `${e.source}__${e.target}`));
   const densityColorScale = d3.scaleLinear()
     .domain([0, 0.35, 1])
     .range(["#dbeafe", "#38bdf8", "#1e3a8a"]);
@@ -1092,7 +1103,7 @@ function StressTestView({ geo, network }) {
               );
             })}
 
-            {network.edges.map((e, i) => {
+            {visibleEdges.map((e, i) => {
               const s = nodeMap[e.source];
               const t = nodeMap[e.target];
               if (!s || !t) return null;
@@ -2075,6 +2086,7 @@ export default function BirdMigrationMap() {
   const [selectedMonth,  setSelectedMonth]  = useState(MONTHS[0]);
   const [showALAN,        setShowALAN]        = useState(false);
   const [alanOpacity,     setAlanOpacity]     = useState(0.6);
+  const [activeSeasons,   setActiveSeasons]   = useState(() => new Set([SEASONS[0].key]));
 
   // Data state
   const [density,    setDensity]    = useState([]);
@@ -2402,6 +2414,36 @@ export default function BirdMigrationMap() {
             </div>
           )}
 
+          {(activeView === "network" || activeView === "stress") && (
+            <div style={s.sideSection}>
+              <div style={s.sideLabel}>Seasons shown</div>
+              {SEASONS.map(season => (
+                <label key={season.key} style={s.toggle}>
+                  <input
+                    type="checkbox"
+                    style={s.checkbox}
+                    checked={activeSeasons.has(season.key)}
+                    onChange={e => {
+                      setActiveSeasons(prev => {
+                        const next = new Set(prev);
+                        if (e.target.checked) next.add(season.key);
+                        else next.delete(season.key);
+                        return next;
+                      });
+                    }}
+                  />
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <span style={{
+                      width: 10, height: 10, borderRadius: 999,
+                      background: season.color, display: "inline-block",
+                    }} />
+                    {season.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+
           <div style={s.sideSection}>
             <div style={s.sideLabel}>Year</div>
             <select style={s.select} value={selectedYear}
@@ -2503,10 +2545,10 @@ export default function BirdMigrationMap() {
               />
             )}
             {activeView === "network" && (
-              <NetworkView geo={geo} network={network} />
+              <NetworkView geo={geo} network={network} activeSeasons={activeSeasons} />
             )}
             {activeView === "stress" && (
-              <StressTestView geo={geo} network={network} />
+              <StressTestView geo={geo} network={network} activeSeasons={activeSeasons} />
             )}
             {activeView === "experiments" && (
               <ExperimentsView
