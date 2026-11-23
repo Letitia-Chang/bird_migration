@@ -2,7 +2,7 @@
 
 An interactive tool that models North American bird migration as a network and tests whether stopover sites exposed to artificial light at night (ALAN) are structurally critical to that network — i.e., whether losing them would fragment migration connectivity more than losing random sites.
 
-**[Live Demo →](https://bird-migration-git-main-ting-ya.vercel.app/)**
+**[Live Demo →](https://bird-migration-tau.vercel.app/)**
 
 ## The Research Question
 
