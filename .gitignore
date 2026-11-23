@@ -49,3 +49,6 @@ scripts/data/
 .Rhistory
 graphify-out/
 backend/saved_networks_backup/
+
+# Local tool settings
+.claude/
