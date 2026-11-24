@@ -62,7 +62,10 @@ def get_saved_network_path(species: str, year: int):
     safe_species = safe_species_filename(species)
     return SAVED_NETWORK_DIR / f"{safe_species}_{year}_network.json"
 
-@lru_cache(maxsize=None)
+# maxsize=1: one parsed file can take ~250 MB of RAM, so keep only the
+# species/year currently being viewed. This keeps the API inside a 512 MB
+# free-tier instance; switching species re-parses once (a few seconds).
+@lru_cache(maxsize=1)
 def load_saved_network(species: str, year: int):
     # A single network file can be 70+ MB; a full Network/Experiments view
     # load fires ~24 requests (12 months x nodes + edges), each of which used
