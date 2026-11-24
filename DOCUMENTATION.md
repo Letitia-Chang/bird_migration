@@ -20,14 +20,14 @@ Prior research shows ALAN is a strong predictor of bird stopover density and alt
                                               │
                                               │ falls back to
                                               ▼
-                                    backend/saved_networks/*.json
-                                    (pre-computed node/edge cache)
+                                    backend/saved_networks/<species>_<year>/
+                                    (pre-computed per-month node/edge cache, gzipped)
 ```
 
 - **Frontend** (`frontend/`): React + D3.js SVG rendering, four views (Map, Network, Stress Test, Experiments), Vite dev server.
 - **Backend** (`backend/main.py`): FastAPI service exposing bird observation, nightlight, network, and experiment endpoints.
 - **Database**: Supabase (managed Postgres) storing raw aggregated observations, nightlight averages, and H3 cell geometry.
-- **Cache layer** (`backend/saved_networks/`): Since live node/edge computation is O(sources × targets) per month and can take minutes for large species, each species×year's full 12-month node/edge set is pre-computed once and cached as JSON. The `/nodes` and `/edges` endpoints check this cache first and only fall back to a live DB query if no cache file exists for that species+year.
+- **Cache layer** (`backend/saved_networks/`): Since live node/edge computation is O(sources × targets) per month and can take minutes for large species, each species×year's 12-month node/edge set is pre-computed once and stored as one small gzipped JSON file per month and kind (`<species>_<year>/<MM>_{nodes,edges}.json.gz`). The `/nodes` and `/edges` endpoints stream these bytes as-is (`Content-Encoding: gzip`, browser-cacheable for a day), so a full Network view load takes well under a second of server time and peak API memory stays under ~100 MB. They only fall back to a live DB query if no cache file exists for that species+year.
 
 ## 3. Data Sources & Collection
 
@@ -69,7 +69,7 @@ All processing scripts live in `scripts/`.
 
 ### 4.3 `build_saved_networks.py`
 
-Regenerates the `backend/saved_networks/*.json` cache files directly from the database (see §6), replicating the backend's exact node/edge query and scoring logic but vectorized with numpy/pandas so a full species-year (12 months of pairwise distance scoring) completes in seconds rather than timing out over HTTP.
+Regenerates the full-year `backend/saved_networks/*_network.json` files directly from the database, then runs `split_saved_networks.py` to write the per-month gzipped files the API serves (the full-year files are git-ignored build intermediates) (see §6), replicating the backend's exact node/edge query and scoring logic but vectorized with numpy/pandas so a full species-year (12 months of pairwise distance scoring) completes in seconds rather than timing out over HTTP.
 
 ## 5. Database Schema
 
@@ -139,7 +139,7 @@ bird_migration-main/
 ├── backend/
 │   ├── main.py                  # FastAPI app: all endpoints + network/metrics logic
 │   ├── requirements.txt
-│   ├── saved_networks/          # Pre-computed per-species-per-year node/edge JSON cache
+│   ├── saved_networks/          # Pre-computed per-month node/edge cache (gzipped JSON)
 │   └── .env                     # Supabase credentials (not committed)
 ├── frontend/
 │   ├── src/App.jsx              # All views, D3 rendering, API client
@@ -147,7 +147,8 @@ bird_migration-main/
 ├── scripts/
 │   ├── process_ebird.py         # eBird EBD → h3_cells + species tables
 │   ├── process_nightlight.py    # VNP46A3 HDF5 → nightlight table (yearly)
-│   ├── build_saved_networks.py  # Regenerates saved_networks/*.json from live DB
+│   ├── build_saved_networks.py  # Regenerates the network cache from the live DB
+│   ├── split_saved_networks.py  # Splits full-year files into per-month .json.gz
 │   ├── export_to_new_supabase.py# Migrates all tables between Supabase projects
 │   └── .env                     # Supabase + NASA/eBird credentials (not committed)
 └── README.md                    # Quickstart / setup instructions

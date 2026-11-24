@@ -312,6 +312,10 @@ def main():
             print(f"\n{common_name} {year}")
             build_one(common_name, table, year, out_path)
 
+    # Split into the per-month, pre-gzipped files the API actually serves.
+    from split_saved_networks import main as split_main
+    split_main()
+
     print("\nAll done.")
 
 
