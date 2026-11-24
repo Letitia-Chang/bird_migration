@@ -45,7 +45,7 @@ Full methodology, database schema, and API reference are in [DOCUMENTATION.md](D
 | Layer | Stack |
 |---|---|
 | Frontend | React, D3.js, TopoJSON, Vite — deployed on Vercel |
-| Backend | FastAPI (Python) — deployed on Railway |
+| Backend | FastAPI (Python) — deployed on Render (free tier) |
 | Database | PostgreSQL via Supabase |
 | Data processing | pandas, H3, h5py (NASA HDF5), numpy |
 
