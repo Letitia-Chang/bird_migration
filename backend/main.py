@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
+import gzip
 from dotenv import load_dotenv
 from pathlib import Path
 import os
@@ -53,7 +54,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SAVED_NETWORK_DIR = Path("saved_networks")
+SAVED_NETWORK_DIR = Path(__file__).resolve().parent / "saved_networks"
+
+# Browsers may cache network responses for a day; the data only changes when
+# the saved networks are rebuilt and redeployed.
+NETWORK_CACHE_HEADERS = {"Cache-Control": "public, max-age=86400"}
 
 def safe_species_filename(species: str):
     return species.lower().replace(" ", "_").replace("'", "")
@@ -61,6 +66,50 @@ def safe_species_filename(species: str):
 def get_saved_network_path(species: str, year: int):
     safe_species = safe_species_filename(species)
     return SAVED_NETWORK_DIR / f"{safe_species}_{year}_network.json"
+
+# ---------------------------------------------------------------------------
+# Pre-split network cache (see scripts/split_saved_networks.py)
+#
+# saved_networks/<species>_<year>/<MM>_{nodes,edges}.json.gz holds exactly the
+# rows /nodes and /edges return for one month, already gzipped. Serving these
+# bytes directly avoids parsing a full-year file (up to ~78 MB / ~250 MB RAM)
+# and re-serializing thousands of rows per request, which made the Network
+# view take ~20 s on a free-tier instance. Each file is <1 MB, so a bounded
+# in-memory cache of them stays small.
+# ---------------------------------------------------------------------------
+@lru_cache(maxsize=96)
+def load_month_gz(species: str, year: int, month_num: int, kind: str):
+    path = (
+        SAVED_NETWORK_DIR
+        / f"{safe_species_filename(species)}_{year}"
+        / f"{month_num:02d}_{kind}.json.gz"
+    )
+    if not path.exists():
+        return None
+    return path.read_bytes()
+
+
+def month_rows(species: str, year: int, month_num: int, kind: str):
+    """Parsed rows from the pre-split cache, or None if not cached."""
+    data = load_month_gz(species, year, month_num, kind)
+    if data is None:
+        return None
+    return json.loads(gzip.decompress(data))
+
+
+def gz_json_response(request: Request, data: bytes) -> Response:
+    """Send pre-gzipped JSON as-is when the client accepts gzip (all browsers do)."""
+    if "gzip" in request.headers.get("accept-encoding", ""):
+        return Response(
+            content=data,
+            media_type="application/json",
+            headers={**NETWORK_CACHE_HEADERS, "Content-Encoding": "gzip", "Vary": "Accept-Encoding"},
+        )
+    return Response(
+        content=gzip.decompress(data),
+        media_type="application/json",
+        headers={**NETWORK_CACHE_HEADERS, "Vary": "Accept-Encoding"},
+    )
 
 # maxsize=1: one parsed file can take ~250 MB of RAM, so keep only the
 # species/year currently being viewed. This keeps the API inside a 512 MB
@@ -452,6 +501,10 @@ def _fetch_nodes_data(species: str, year: int, month: str):
     if not month_num:
         raise HTTPException(status_code=400, detail="Invalid month")
 
+    cached = month_rows(species, year, month_num, "nodes")
+    if cached is not None:
+        return cached
+
     saved_network = load_saved_network(species, year)
     if saved_network is not None and month_num:
         return [
@@ -499,10 +552,17 @@ def _fetch_nodes_data(species: str, year: int, month: str):
 
 @app.get("/nodes")
 def get_nodes(
+    request: Request,
     species: str = Query(..., description="Common name of the bird species"),
     year: int = Query(..., description="Year to filter by"),
     month: str = Query(..., description="Month to filter by")
 ):
+    month_num = MONTH_DICT.get(month)
+    if species in SPECIES_DICT and month_num:
+        data = load_month_gz(species, year, month_num, "nodes")
+        if data is not None:
+            return gz_json_response(request, data)
+
     rows = _fetch_nodes_data(species, year, month)
     return JSONResponse(content=rows)
 
@@ -522,6 +582,10 @@ def _fetch_edges_data(
 
     if not month_num:
         raise HTTPException(status_code=400, detail="Invalid month")
+
+    cached = month_rows(species, year, month_num, "edges")
+    if cached is not None:
+        return cached
 
     saved_network = load_saved_network(species, year)
 
@@ -566,6 +630,7 @@ def _fetch_edges_data(
 
 @app.get("/edges")
 def get_edges(
+    request: Request,
     species: str = Query(..., description="Common name of the bird species"),
     year: int = Query(..., description="Source year"),
     month: str = Query(..., description="Source month"),
@@ -573,8 +638,16 @@ def get_edges(
     min_distance_miles: float = Query(0.0, description="Minimum distance required for an edge"),
     min_count: int = Query(6, description="Minimum grouped_count threshold"),
     top_k_per_source: int = Query(10, description="Keep top K outgoing edges per source"),
-    top_k_per_target: int = Query(10, description="Keep top K incoming edges per target")
+    top_k_per_target: int = Query(10, description="Keep top K incoming edges per target"),
 ):
+    # Like the previous saved-network path, cached edges use the default
+    # parameters the saved networks were built with.
+    month_num = MONTH_DICT.get(month)
+    if species in SPECIES_DICT and month_num:
+        data = load_month_gz(species, year, month_num, "edges")
+        if data is not None:
+            return gz_json_response(request, data)
+
     rows = _fetch_edges_data(
         species, year, month,
         max_distance_miles, min_distance_miles,

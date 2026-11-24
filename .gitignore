@@ -52,3 +52,7 @@ backend/saved_networks_backup/
 
 # Local tool settings
 .claude/
+
+# Full-year network files are build intermediates; the API serves the
+# per-month gzipped splits (scripts/split_saved_networks.py).
+backend/saved_networks/*_network.json
