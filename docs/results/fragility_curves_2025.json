@@ -1,0 +1,318 @@
+{
+ "Ruby-throated Hummingbird": [
+  {
+   "pct_removed": 0.0,
+   "brightest": 0.6689497716894978,
+   "random": 0.6689497716894978,
+   "activity_matched": 0.6689497716894978,
+   "busiest": 0.6689497716894978
+  },
+  {
+   "pct_removed": 0.1,
+   "brightest": 0.5730593607305936,
+   "random": 0.5438356164383562,
+   "activity_matched": 0.439634703196347,
+   "busiest": 0.2808219178082192
+  },
+  {
+   "pct_removed": 0.2,
+   "brightest": 0.3515981735159817,
+   "random": 0.43095890410958904,
+   "activity_matched": 0.23858447488584475,
+   "busiest": 0.18036529680365296
+  },
+  {
+   "pct_removed": 0.3,
+   "brightest": 0.1963470319634703,
+   "random": 0.314337899543379,
+   "activity_matched": 0.14858447488584475,
+   "busiest": 0.11643835616438356
+  },
+  {
+   "pct_removed": 0.4,
+   "brightest": 0.09360730593607305,
+   "random": 0.19378995433789953,
+   "activity_matched": 0.08273972602739725,
+   "busiest": 0.07077625570776255
+  },
+  {
+   "pct_removed": 0.5,
+   "brightest": 0.0547945205479452,
+   "random": 0.1117808219178082,
+   "activity_matched": 0.055981735159817345,
+   "busiest": 0.02511415525114155
+  },
+  {
+   "pct_removed": 0.6,
+   "brightest": 0.03424657534246575,
+   "random": 0.06767123287671233,
+   "activity_matched": 0.029269406392694063,
+   "busiest": 0.01598173515981735
+  },
+  {
+   "pct_removed": 0.7,
+   "brightest": 0.02968036529680365,
+   "random": 0.03753424657534246,
+   "activity_matched": 0.016757990867579908,
+   "busiest": 0.01598173515981735
+  },
+  {
+   "pct_removed": 0.8,
+   "brightest": 0.02054794520547945,
+   "random": 0.0191324200913242,
+   "activity_matched": 0.011004566210045662,
+   "busiest": 0.01598173515981735
+  },
+  {
+   "pct_removed": 0.9,
+   "brightest": 0.0182648401826484,
+   "random": 0.009178082191780821,
+   "activity_matched": 0.005981735159817352,
+   "busiest": 0.00684931506849315
+  },
+  {
+   "pct_removed": 1.0,
+   "brightest": 0.0,
+   "random": 0.0,
+   "activity_matched": 0.0,
+   "busiest": 0.0
+  }
+ ],
+ "Swainson's Thrush": [
+  {
+   "pct_removed": 0.0,
+   "brightest": 0.6650602409638554,
+   "random": 0.6650602409638554,
+   "activity_matched": 0.6650602409638554,
+   "busiest": 0.6650602409638554
+  },
+  {
+   "pct_removed": 0.1,
+   "brightest": 0.3493975903614458,
+   "random": 0.5132048192771085,
+   "activity_matched": 0.45277108433734936,
+   "busiest": 0.12771084337349398
+  },
+  {
+   "pct_removed": 0.2,
+   "brightest": 0.1855421686746988,
+   "random": 0.38173493975903616,
+   "activity_matched": 0.279421686746988,
+   "busiest": 0.06746987951807229
+  },
+  {
+   "pct_removed": 0.3,
+   "brightest": 0.14698795180722893,
+   "random": 0.26520481927710843,
+   "activity_matched": 0.16072289156626507,
+   "busiest": 0.03132530120481928
+  },
+  {
+   "pct_removed": 0.4,
+   "brightest": 0.0963855421686747,
+   "random": 0.18197590361445784,
+   "activity_matched": 0.10062650602409638,
+   "busiest": 0.02650602409638554
+  },
+  {
+   "pct_removed": 0.5,
+   "brightest": 0.06506024096385542,
+   "random": 0.11537349397590362,
+   "activity_matched": 0.048337349397590365,
+   "busiest": 0.01927710843373494
+  },
+  {
+   "pct_removed": 0.6,
+   "brightest": 0.06506024096385542,
+   "random": 0.07787951807228916,
+   "activity_matched": 0.02289156626506024,
+   "busiest": 0.016867469879518072
+  },
+  {
+   "pct_removed": 0.7,
+   "brightest": 0.06506024096385542,
+   "random": 0.04255421686746988,
+   "activity_matched": 0.015325301204819277,
+   "busiest": 0.016867469879518072
+  },
+  {
+   "pct_removed": 0.8,
+   "brightest": 0.06506024096385542,
+   "random": 0.019566265060240964,
+   "activity_matched": 0.007855421686746989,
+   "busiest": 0.007228915662650603
+  },
+  {
+   "pct_removed": 0.9,
+   "brightest": 0.06506024096385542,
+   "random": 0.008289156626506025,
+   "activity_matched": 0.005638554216867471,
+   "busiest": 0.004819277108433735
+  },
+  {
+   "pct_removed": 1.0,
+   "brightest": 0.0,
+   "random": 0.0,
+   "activity_matched": 0.0,
+   "busiest": 0.0
+  }
+ ],
+ "Magnolia Warbler": [
+  {
+   "pct_removed": 0.0,
+   "brightest": 0.7808219178082192,
+   "random": 0.7808219178082192,
+   "activity_matched": 0.7808219178082192,
+   "busiest": 0.7808219178082192
+  },
+  {
+   "pct_removed": 0.1,
+   "brightest": 0.6273972602739726,
+   "random": 0.6625205479452054,
+   "activity_matched": 0.5923287671232876,
+   "busiest": 0.2821917808219178
+  },
+  {
+   "pct_removed": 0.2,
+   "brightest": 0.5123287671232877,
+   "random": 0.5532054794520548,
+   "activity_matched": 0.4584109589041096,
+   "busiest": 0.09315068493150686
+  },
+  {
+   "pct_removed": 0.3,
+   "brightest": 0.34794520547945207,
+   "random": 0.428,
+   "activity_matched": 0.28586301369863015,
+   "busiest": 0.07123287671232877
+  },
+  {
+   "pct_removed": 0.4,
+   "brightest": 0.19452054794520549,
+   "random": 0.3198904109589041,
+   "activity_matched": 0.1989041095890411,
+   "busiest": 0.06301369863013699
+  },
+  {
+   "pct_removed": 0.5,
+   "brightest": 0.09041095890410959,
+   "random": 0.22350684931506848,
+   "activity_matched": 0.08761643835616438,
+   "busiest": 0.0547945205479452
+  },
+  {
+   "pct_removed": 0.6,
+   "brightest": 0.07397260273972603,
+   "random": 0.1366027397260274,
+   "activity_matched": 0.05364383561643835,
+   "busiest": 0.052054794520547946
+  },
+  {
+   "pct_removed": 0.7,
+   "brightest": 0.06301369863013699,
+   "random": 0.07791780821917808,
+   "activity_matched": 0.034904109589041096,
+   "busiest": 0.038356164383561646
+  },
+  {
+   "pct_removed": 0.8,
+   "brightest": 0.049315068493150684,
+   "random": 0.02871232876712329,
+   "activity_matched": 0.01873972602739726,
+   "busiest": 0.024657534246575342
+  },
+  {
+   "pct_removed": 0.9,
+   "brightest": 0.0410958904109589,
+   "random": 0.012493150684931507,
+   "activity_matched": 0.009315068493150684,
+   "busiest": 0.00821917808219178
+  },
+  {
+   "pct_removed": 1.0,
+   "brightest": 0.0,
+   "random": 0.0,
+   "activity_matched": 0.0,
+   "busiest": 0.0
+  }
+ ],
+ "Song Sparrow": [
+  {
+   "pct_removed": 0.0,
+   "brightest": 0.41855670103092785,
+   "random": 0.41855670103092785,
+   "activity_matched": 0.41855670103092785,
+   "busiest": 0.41855670103092785
+  },
+  {
+   "pct_removed": 0.1,
+   "brightest": 0.2268041237113402,
+   "random": 0.27311340206185564,
+   "activity_matched": 0.18870103092783505,
+   "busiest": 0.13402061855670103
+  },
+  {
+   "pct_removed": 0.2,
+   "brightest": 0.1422680412371134,
+   "random": 0.19542268041237115,
+   "activity_matched": 0.09072164948453608,
+   "busiest": 0.041237113402061855
+  },
+  {
+   "pct_removed": 0.3,
+   "brightest": 0.12371134020618557,
+   "random": 0.10977319587628866,
+   "activity_matched": 0.047835051546391755,
+   "busiest": 0.032989690721649485
+  },
+  {
+   "pct_removed": 0.4,
+   "brightest": 0.05360824742268041,
+   "random": 0.08144329896907215,
+   "activity_matched": 0.02754639175257732,
+   "busiest": 0.032989690721649485
+  },
+  {
+   "pct_removed": 0.5,
+   "brightest": 0.032989690721649485,
+   "random": 0.05303092783505155,
+   "activity_matched": 0.019175257731958762,
+   "busiest": 0.016494845360824743
+  },
+  {
+   "pct_removed": 0.6,
+   "brightest": 0.02268041237113402,
+   "random": 0.03154639175257732,
+   "activity_matched": 0.01377319587628866,
+   "busiest": 0.012371134020618556
+  },
+  {
+   "pct_removed": 0.7,
+   "brightest": 0.012371134020618556,
+   "random": 0.018762886597938143,
+   "activity_matched": 0.00997938144329897,
+   "busiest": 0.010309278350515464
+  },
+  {
+   "pct_removed": 0.8,
+   "brightest": 0.012371134020618556,
+   "random": 0.011298969072164948,
+   "activity_matched": 0.006515463917525773,
+   "busiest": 0.010309278350515464
+  },
+  {
+   "pct_removed": 0.9,
+   "brightest": 0.006185567010309278,
+   "random": 0.006185567010309279,
+   "activity_matched": 0.004783505154639175,
+   "busiest": 0.004123711340206186
+  },
+  {
+   "pct_removed": 1.0,
+   "brightest": 0.0,
+   "random": 0.0,
+   "activity_matched": 0.0,
+   "busiest": 0.0
+  }
+ ]
+}
