@@ -31,15 +31,6 @@ const API = {
       `${BASE_URL}/edges?species=${encodeURIComponent(species)}&year=${year}&month=${encodeURIComponent(month)}&max_distance_miles=${maxDistanceMiles}&min_distance_miles=${minDistanceMiles}&min_count=${minCount}&top_k_per_source=${topKPerSource}&top_k_per_target=${topKPerTarget}`
     ).then(r => r.json()),
 
-  robustness: (species, year, month, removalPct = 0.3, trials = 20) =>
-    fetch(
-      `${BASE_URL}/experiment/robustness?species=${encodeURIComponent(species)}&year=${year}&month=${encodeURIComponent(month)}&removal_pct=${removalPct}&trials=${trials}`
-    ).then(r => r.json()),
-
-  fragilityCurve: (species, year, month, steps = 10, trials = 20) =>
-    fetch(
-      `${BASE_URL}/experiment/fragility-curve?species=${encodeURIComponent(species)}&year=${year}&month=${encodeURIComponent(month)}&steps=${steps}&trials=${trials}`
-    ).then(r => r.json()),
   // Add more endpoints here as your backend grows:
   // network:    (species, year)             => fetch(`${BASE_URL}/network?species=${species}&year=${year}`).then(r => r.json()),
   // stresstest: (species, year, threshold)  => fetch(`${BASE_URL}/stresstest?species=${species}&year=${year}&threshold=${threshold}`).then(r => r.json()),
@@ -1445,7 +1436,7 @@ function InfoCard({ species, month, activeView }) {
     map: "Warmer circles show higher eBird observation density. The amber glow shows artificial light at night (ALAN), so you can compare migration activity with illuminated areas.",
     network: "Nodes represent stopover sites and edges represent inferred migration links. Larger nodes indicate higher activity, while wider edges indicate stronger migration flow.",
     stress: "Remove nodes manually from the full-year migration network to test how connectivity changes. Watch how LCC, components, and fragmentation respond as important stopover sites are removed.",
-    experiments: "This view compares random removal against high-light removal on the full-year migration network. A sharper decline under high-light removal suggests stronger structural dependence on illuminated sites.",
+    experiments: "This view compares random removal against high-light removal on the full-year migration network. Caveat: bright sites also tend to be busy sites. Compared against random sites with the same bird activity, high-light removal does no extra damage (see the Key Findings in the README).",
   };
 
   return (

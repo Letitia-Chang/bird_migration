@@ -109,8 +109,9 @@ Favors high-activity cell pairs that are geographically close.
 
 **Experiments**:
 - **Manual stress test** (Stress Test view): user clicks individual stopover nodes to remove them and watches metrics update live.
-- **Robustness comparison** (`/experiment/robustness`): compares removing the *N* brightest nodes first ("high-light removal") against removing *N* random nodes, averaged over multiple trials, at a chosen removal percentage.
-- **Fragility curve** (`/experiment/fragility-curve`): repeats the robustness comparison across removal percentages from 0% to 100%, plotting LCC ratio vs. % removed for both strategies. A steeper decline under high-light removal indicates the network is structurally dependent on illuminated sites.
+- **Robustness comparison** (Experiments view): compares removing the *N* brightest sites first ("high-light removal") against removing *N* random sites, averaged over multiple trials, on the full-year network. Computed in the browser (`computeFrontendRobustness` in `frontend/src/App.jsx`).
+- **Fragility curve** (Experiments view): repeats that comparison across removal percentages from 0% to 100%.
+- **Offline analysis** (`scripts/experiment_results.py`): a Python port of the same logic with more trials, fixed seeds, and two extra baselines: random sites matched to the brightest ones on bird activity, and on latitude. Results and caveats are in the README's Key Findings.
 
 ## 8. API Reference
 
@@ -122,8 +123,6 @@ Base URL: `http://127.0.0.1:8000` (configurable via `VITE_API_URL` on the fronte
 | `GET /nightlight` | `year` | Top 5,000 brightest H3 cells for that year (ALAN overlay) |
 | `GET /nodes` | `species, year, month` | Nodes for that species/month (cache-first, live DB fallback) |
 | `GET /edges` | `species, year, month, max_distance_miles, min_distance_miles, min_count, top_k_per_source, top_k_per_target` | Edges from that month to the next (cache-first, live DB fallback) |
-| `GET /experiment/robustness` | `species, year, month, removal_pct, trials, ...edge params` | Baseline vs. high-light vs. random-average metrics at one removal level |
-| `GET /experiment/fragility-curve` | `species, year, month, steps, trials, ...edge params` | Robustness comparison swept across removal percentages |
 
 ## 9. Frontend Views
 
