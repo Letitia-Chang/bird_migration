@@ -101,3 +101,7 @@ npm run dev
 ```
 
 The app will be available at `http://localhost:5173`.
+
+## License
+
+MIT, see [LICENSE](LICENSE). Originally a Georgia Tech course project (Team 15), rebuilt here on an independent data pipeline and database. eBird data is subject to the [eBird Terms of Use](https://www.birds.cornell.edu/home/ebird-data-access-terms-of-use/) and is not covered by this license.
